@@ -8,59 +8,81 @@ import {
   Button,
   Checkbox,
 } from "@mui/material";
-import {signUp} from '../api/apiCalls'
+import { signUp } from "../api/apiCalls";
 
 function UserSignupPage() {
-  
+  let [agreedClicked, setAgreedClicked] = useState(false);
 
-  let [agreedClicked, setAgreedClicked] = useState(false)
+  let [pendingApiCall, setPendingApiCall] = useState(false);
 
-  let [pendingApiCall,setPendingApiCall] = useState(false)
+  let [errors, setErrors] = useState({});
 
   let [state, setState] = useState({
     username: null,
     password: null,
-    passwordRepeat:null,
+    passwordRepeat: null,
   });
 
   const handleInputChange = (event) => {
+    
     const { name, value } = event.target;
+
+    const errors = {...errors}
+
+    errors[name] = undefined
+
     setState((prevProps) => ({
       ...prevProps,
-      [name]: value
+      [name]: value,
+      errors
     }));
 
-    console.log(state)
+    console.log(state);
   };
 
-  let onSubmitForm =  async (event) => {
+  let onSubmitForm = async (event) => {
     event.preventDefault();
-    
-    setPendingApiCall(true)
 
-    const {username,displayName,password} = state
+    setPendingApiCall(true);
+
+    const { username, displayName, password } = state;
     const body = {
-        username,
-        displayName,
-        password
-    }
-
+      username,
+      displayName,
+      password,
+    };
 
     try {
-        const response = await signUp(body);
-    } catch (error) {}
-    pendingApiCall(false)
-    
-  }
+      const response = await signUp(body);
+    } catch (error) {
 
-  let onChangeAgreed = (event) =>{
-     setAgreedClicked(event.target.checked)
-  }
+      //console.log(error.response.data.validationErrors);
+      
+      if(error.response.data.validationErrors){
+        setErrors((prevState) => ({
+          ...prevState,
+          errors: error.response.data.validationErrors,
+        }));
+      }
+      
+    }
+
+    pendingApiCall(false);
+  };
+
+  let onChangeAgreed = (event) => {
+    setAgreedClicked(event.target.checked);
+  };
 
   return (
     <div>
       <Box
-        sx={{ textAlign: "center", display: "flex", justifyContent: "center", mt:15 }}
+        sx={{
+          textAlign: "center",
+          display: "flex",
+          justifyContent: "center",
+          mt: 15,
+        }}
       >
         <Grid container sx={{ width: "600px", height: "600px" }}>
           <Grid xs={12}>
@@ -74,9 +96,22 @@ function UserSignupPage() {
                 <Typography variant="body2" gutterBottom>
                   Username :
                 </Typography>
+
+                {errors.username && errors.username != "" ? (
+                  <Typography variant="body2" gutterBottom>
+                    {errors.username}
+                  </Typography>
+                ) : null}
+
+
               </Grid>
               <Grid xs={8}>
-                <TextField name="username" id="username" variant="outlined" onChange={handleInputChange} />
+                <TextField
+                  name="username"
+                  id="username"
+                  variant="outlined"
+                  onChange={handleInputChange}
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -88,7 +123,12 @@ function UserSignupPage() {
                 </Typography>
               </Grid>
               <Grid xs={8}>
-                <TextField name="displayName" id="displayName" variant="outlined" onChange={handleInputChange} />
+                <TextField
+                  name="displayName"
+                  id="displayName"
+                  variant="outlined"
+                  onChange={handleInputChange}
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -133,15 +173,21 @@ function UserSignupPage() {
 
           <Grid xs={12}>
             <Grid contaniner>
-              <Grid xs={12} sx={{mb:3}}>
-              <Checkbox onChange={onChangeAgreed}/>
+              <Grid xs={12} sx={{ mb: 3 }}>
+                <Checkbox onChange={onChangeAgreed} />
                 <Typography component="span" variant="body2" gutterBottom>
-                    Okudum Kabul ediyorum.
+                  Okudum Kabul ediyorum.
                 </Typography>
               </Grid>
-        
+
               <Grid xs={12}>
-                <Button disabled={!agreedClicked && pendingApiCall} onSubmit={onSubmitForm} variant="contained">Send</Button>
+                <Button
+                  disabled={!agreedClicked && pendingApiCall}
+                  onSubmit={onSubmitForm}
+                  variant="contained"
+                >
+                  Send
+                </Button>
               </Grid>
             </Grid>
           </Grid>
