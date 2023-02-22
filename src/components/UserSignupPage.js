@@ -31,6 +31,16 @@ function UserSignupPage() {
 
     errors[name] = undefined;
 
+    if(name == "password" || name =="passwordRepeat"){
+      if(name == "password" && value != passwordRepeat){
+        setErrors({...prevProps,passwordRepeat:"Password mismatch"})
+      }
+      else if(name=='passwordRepeat' && value !=password )
+      {
+        setErrors({...prevProps,passwordRepeat:undefined})
+      }
+    }
+
     setState((prevProps) => ({
       ...prevProps,
       [name]: value,
@@ -121,13 +131,7 @@ function UserSignupPage() {
                 </Typography>
               </Grid>
               <Grid xs={8}>
-                <TextField
-                  name="password"
-                  id="password"
-                  type="password"
-                  autoComplete="off"
-                  onChange={handleInputChange}
-                />
+                 <Input name="password" error={errors.validationErrors.password} type="password" onChange={handleInputChange}/>
               </Grid>
             </Grid>
           </Grid>
@@ -140,13 +144,7 @@ function UserSignupPage() {
                 </Typography>
               </Grid>
               <Grid xs={8}>
-                <TextField
-                  name="passwordRepeat"
-                  id="passwordRepeat"
-                  type="password"
-                  autoComplete="off"
-                  onChange={handleInputChange}
-                />
+                <InputName name="passwordRepeat" error={errors.validationErrors.passwordRepeat} type="password" onChange={handleInputChange}/>
               </Grid>
             </Grid>
           </Grid>
@@ -162,7 +160,7 @@ function UserSignupPage() {
 
               <Grid xs={12}>
                 <Button
-                  disabled={!agreedClicked && pendingApiCall}
+                  disabled={!agreedClicked && pendingApiCall || passwordRepeat !=undefined }
                   onSubmit={onSubmitForm}
                   variant="contained"
                 >
