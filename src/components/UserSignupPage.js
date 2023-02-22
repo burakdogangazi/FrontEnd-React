@@ -9,6 +9,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import { signUp } from "../api/apiCalls";
+import Input from "../components/Input"
 
 function UserSignupPage() {
   let [agreedClicked, setAgreedClicked] = useState(false);
@@ -24,17 +25,16 @@ function UserSignupPage() {
   });
 
   const handleInputChange = (event) => {
-    
     const { name, value } = event.target;
 
-    const errors = {...errors}
+    const errors = { ...errors };
 
-    errors[name] = undefined
+    errors[name] = undefined;
 
     setState((prevProps) => ({
       ...prevProps,
       [name]: value,
-      errors
+      errors,
     }));
 
     console.log(state);
@@ -55,16 +55,14 @@ function UserSignupPage() {
     try {
       const response = await signUp(body);
     } catch (error) {
-
       //console.log(error.response.data.validationErrors);
-      
-      if(error.response.data.validationErrors){
+
+      if (error.response.data.validationErrors) {
         setErrors((prevState) => ({
           ...prevState,
           errors: error.response.data.validationErrors,
         }));
       }
-      
     }
 
     pendingApiCall(false);
@@ -96,22 +94,9 @@ function UserSignupPage() {
                 <Typography variant="body2" gutterBottom>
                   Username :
                 </Typography>
-
-                {errors.username && errors.username != "" ? (
-                  <Typography variant="body2" gutterBottom>
-                    {errors.username}
-                  </Typography>
-                ) : null}
-
-
               </Grid>
               <Grid xs={8}>
-                <TextField
-                  name="username"
-                  id="username"
-                  variant="outlined"
-                  onChange={handleInputChange}
-                />
+                  <Input name="username" error={errors.validationErrors.username} onChange={handleInputChange} />
               </Grid>
             </Grid>
           </Grid>
@@ -123,12 +108,7 @@ function UserSignupPage() {
                 </Typography>
               </Grid>
               <Grid xs={8}>
-                <TextField
-                  name="displayName"
-                  id="displayName"
-                  variant="outlined"
-                  onChange={handleInputChange}
-                />
+                <Input name="displayName" error={errors.validationErrors.displayName} onChange={handleInputChange} />
               </Grid>
             </Grid>
           </Grid>
